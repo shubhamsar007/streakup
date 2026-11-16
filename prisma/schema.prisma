@@ -1,0 +1,391 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum HabitTrackingType {
+  CHECKBOX
+  COUNT
+  DURATION
+}
+
+enum HabitVisibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum HabitStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum FrequencyType {
+  DAILY
+  SELECTED_DAYS
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+}
+
+enum FollowStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum ActivityType {
+  HABIT_COMPLETED
+  STREAK_MILESTONE
+}
+
+enum NotificationType {
+  NEW_FOLLOWER
+  FOLLOW_REQUEST
+  FOLLOW_REQUEST_ACCEPTED
+  ACTIVITY_LIKED
+  ACTIVITY_COMMENTED
+  STREAK_MILESTONE
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
+// ─── Users & Auth ─────────────────────────────────────────────────────────────
+
+model User {
+  id              String     @id @default(uuid())
+  email           String     @unique
+  username        String     @unique
+  passwordHash    String?    @map("password_hash")
+  timezone        String     @default("UTC")
+  role            UserRole   @default(USER)
+  status          UserStatus @default(ACTIVE)
+  emailVerifiedAt DateTime?  @map("email_verified_at")
+  onboardingDone  Boolean    @default(false) @map("onboarding_done")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  profile       Profile?
+  habits        Habit[]
+  dailyTasks    DailyTask[]
+  sessions      Session[]
+  follows       Follow[]        @relation("FollowerUser")
+  followers     Follow[]        @relation("FollowingUser")
+  activities    Activity[]
+  likes         Like[]
+  comments      Comment[]
+  notifications Notification[]  @relation("NotificationUser")
+  actorNotifications Notification[] @relation("NotificationActor")
+  blocks        Block[]         @relation("BlockerUser")
+  blockedBy     Block[]         @relation("BlockedUser")
+  reports       Report[]        @relation("ReporterUser")
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([username])
+  @@index([email])
+  @@map("users")
+}
+
+model Profile {
+  id         String            @id @default(uuid())
+  userId     String            @unique @map("user_id")
+  fullName   String            @map("full_name")
+  bio        String?
+  avatarUrl  String?           @map("avatar_url")
+  visibility ProfileVisibility @default(PUBLIC)
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@map("password_reset_tokens")
+}
+
+// ─── Habits ───────────────────────────────────────────────────────────────────
+
+model Habit {
+  id           String            @id @default(uuid())
+  userId       String            @map("user_id")
+  name         String
+  description  String?
+  category     String
+  icon         String?
+  trackingType HabitTrackingType @map("tracking_type")
+  targetValue  Decimal?          @map("target_value")
+  unit         String?
+  visibility   HabitVisibility   @default(PUBLIC)
+  status       HabitStatus       @default(ACTIVE)
+  startDate    DateTime          @map("start_date") @db.Date
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleVersions HabitScheduleVersion[]
+  completions      HabitCompletion[]
+  activities       Activity[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("habits")
+}
+
+model HabitScheduleVersion {
+  id            String        @id @default(uuid())
+  habitId       String        @map("habit_id")
+  frequencyType FrequencyType @map("frequency_type")
+  validFrom     DateTime      @map("valid_from") @db.Date
+  validUntil    DateTime?     @map("valid_until") @db.Date
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  habit        Habit               @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  scheduleDays HabitScheduleDay[]
+
+  @@index([habitId])
+  @@map("habit_schedule_versions")
+}
+
+model HabitScheduleDay {
+  id                String @id @default(uuid())
+  scheduleVersionId String @map("schedule_version_id")
+  weekday           Int    // 1=Mon, 2=Tue, ..., 7=Sun
+
+  scheduleVersion HabitScheduleVersion @relation(fields: [scheduleVersionId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleVersionId, weekday])
+  @@map("habit_schedule_days")
+}
+
+model HabitCompletion {
+  id             String   @id @default(uuid())
+  habitId        String   @map("habit_id")
+  localDate      DateTime @map("local_date") @db.Date
+  completedValue Decimal? @map("completed_value")
+  completedAt    DateTime @map("completed_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  habit      Habit      @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  @@unique([habitId, localDate])
+  @@index([habitId])
+  @@index([habitId, localDate])
+  @@map("habit_completions")
+}
+
+// ─── Daily Tasks ──────────────────────────────────────────────────────────────
+
+model DailyTask {
+  id          String     @id @default(uuid())
+  userId      String     @map("user_id")
+  title       String
+  description String?
+  taskDate    DateTime   @map("task_date") @db.Date
+  priority    String?
+  status      TaskStatus @default(PENDING)
+  completedAt DateTime?  @map("completed_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, taskDate])
+  @@map("daily_tasks")
+}
+
+// ─── Achievements ─────────────────────────────────────────────────────────────
+
+model Achievement {
+  id          String @id @default(uuid())
+  key         String @unique
+  name        String
+  description String
+  milestoneValue Int? @map("milestone_value")
+
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  achievementId String   @map("achievement_id")
+  habitId       String?  @map("habit_id")
+  earnedAt      DateTime @default(now()) @map("earned_at")
+
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId, habitId])
+  @@map("user_achievements")
+}
+
+// ─── Social ───────────────────────────────────────────────────────────────────
+
+model Follow {
+  id          String       @id @default(uuid())
+  followerId  String       @map("follower_id")
+  followingId String       @map("following_id")
+  status      FollowStatus @default(PENDING)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  follower  User @relation("FollowerUser", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("FollowingUser", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId, status])
+  @@index([followingId, status])
+  @@map("follows")
+}
+
+model Activity {
+  id           String          @id @default(uuid())
+  userId       String          @map("user_id")
+  habitId      String?         @map("habit_id")
+  completionId String?         @map("completion_id")
+  type         ActivityType
+  visibility   HabitVisibility @default(PUBLIC)
+  metadata     Json?
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit      Habit?           @relation(fields: [habitId], references: [id], onDelete: SetNull)
+  completion HabitCompletion? @relation(fields: [completionId], references: [id], onDelete: SetNull)
+  likes      Like[]
+  comments   Comment[]
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+model Like {
+  id         String   @id @default(uuid())
+  activityId String   @map("activity_id")
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, userId])
+  @@index([activityId])
+  @@map("likes")
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  activityId String   @map("activity_id")
+  userId     String   @map("user_id")
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([activityId, createdAt])
+  @@map("comments")
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String   @map("blocker_id")
+  blockedId String   @map("blocked_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  blocker User @relation("BlockerUser", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedUser", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@map("blocks")
+}
+
+model Report {
+  id         String       @id @default(uuid())
+  reporterId String       @map("reporter_id")
+  targetType String       @map("target_type")
+  targetId   String       @map("target_id")
+  reason     String
+  status     ReportStatus @default(PENDING)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  reviewedAt DateTime?    @map("reviewed_at")
+
+  reporter User @relation("ReporterUser", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  actorId   String?          @map("actor_id")
+  type      NotificationType
+  entityId  String?          @map("entity_id")
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user  User  @relation("NotificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
