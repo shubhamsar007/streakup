@@ -27,7 +27,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.endsWith(".svg") ||
     pathname.endsWith(".png") ||
-    pathname.endsWith(".ico")
+    pathname.endsWith(".ico") ||
+    pathname.endsWith(".json") ||
+    pathname === "/sw.js" ||
+    pathname === "/sw.js.map"
   ) {
     return NextResponse.next();
   }
