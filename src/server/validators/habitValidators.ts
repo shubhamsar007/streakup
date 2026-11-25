@@ -15,7 +15,6 @@ export const createHabitSchema = z
     frequencyType: z.enum(["DAILY", "SELECTED_DAYS"]),
     selectedDays: z
       .array(z.number().int().min(1).max(7))
-      .min(1, "Select at least one day")
       .optional(),
     startDate: z
       .string()

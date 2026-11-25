@@ -3,6 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -86,7 +87,7 @@ export function HabitForm({
     handleSubmit,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<HabitFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -286,8 +287,15 @@ export function HabitForm({
         )}
       </div>
 
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? "Saving..." : submitLabel}
+      <Button type="submit" disabled={isSubmitting || isLoading} className="w-full">
+        {isSubmitting || isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Saving...
+          </>
+        ) : (
+          submitLabel
+        )}
       </Button>
     </form>
   );

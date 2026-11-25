@@ -40,6 +40,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export function RegisterForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -52,24 +53,28 @@ export function RegisterForm() {
 
   async function onSubmit(data: RegisterFormData) {
     setServerError(null);
-    const result = await signUp.email({
-      email: data.email,
-      password: data.password,
-      name: data.fullName,
-      username: data.username,
-    } as Parameters<typeof signUp.email>[0]);
+    try {
+      const result = await signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.fullName,
+        username: data.username,
+      } as Parameters<typeof signUp.email>[0]);
 
-    if (result.error) {
-      if (result.error.message?.includes("already")) {
-        setServerError("An account with this email or username already exists.");
-      } else {
-        setServerError(result.error.message || "Registration failed. Please try again.");
+      if (result.error) {
+        if (result.error.message?.toLowerCase().includes("already")) {
+          setServerError("An account with this email or username already exists.");
+        } else {
+          setServerError(result.error.message || "Registration failed. Please try again.");
+        }
+        return;
       }
-      return;
-    }
 
-    router.push("/onboarding");
-    router.refresh();
+      router.push("/onboarding");
+      router.refresh();
+    } catch {
+      setServerError("Something went wrong. Please check your connection and try again.");
+    }
   }
 
   return (
@@ -151,13 +156,26 @@ export function RegisterForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input
-          id="confirmPassword"
-          type={showPassword ? "text" : "password"}
-          placeholder="Repeat your password"
-          autoComplete="new-password"
-          {...register("confirmPassword")}
-        />
+        <div className="relative">
+          <Input
+            id="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Repeat your password"
+            autoComplete="new-password"
+            {...register("confirmPassword")}
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {errors.confirmPassword && (
           <p className="text-xs text-destructive">
             {errors.confirmPassword.message}
