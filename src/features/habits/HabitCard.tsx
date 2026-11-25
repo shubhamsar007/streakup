@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Flame, Pause, Play, Archive, Edit, CheckCircle, Circle, Hash, Timer } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Flame, Pause, Play, Archive, Edit, CheckCircle, Hash, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -89,103 +88,93 @@ export function HabitCard({ habit, onStatusChange }: HabitCardProps) {
   }
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-3">
-      {/* Top Row */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link
-              href={`/habits/${habit.id}`}
-              className="text-sm font-semibold text-foreground hover:text-primary transition-colors truncate"
-            >
-              {habit.name}
-            </Link>
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize",
-                STATUS_STYLES[habit.status] ?? "bg-secondary text-muted-foreground"
-              )}
-            >
-              {habit.status.toLowerCase()}
-            </span>
-          </div>
-          {habit.description && (
-            <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-              {habit.description}
-            </p>
-          )}
+    <div className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col">
+      {/* Main content */}
+      <Link href={`/habits/${habit.id}`} className="flex-1 p-4 block active:bg-secondary/50 transition-colors">
+        {/* Top Row */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <span className="text-[15px] font-semibold text-foreground leading-snug flex-1">
+            {habit.name}
+          </span>
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize shrink-0",
+              STATUS_STYLES[habit.status] ?? "bg-secondary text-muted-foreground"
+            )}
+          >
+            {habit.status.toLowerCase()}
+          </span>
         </div>
-      </div>
 
-      {/* Meta Row */}
-      <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
-        <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 font-medium text-foreground">
-          {habit.category}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          {getTrackingIcon(habit.trackingType)}
-          {habit.trackingType === "CHECKBOX"
-            ? "Checkbox"
-            : habit.targetValue
-            ? `${habit.targetValue} ${habit.unit ?? ""}`
-            : habit.trackingType.toLowerCase()}
-        </span>
-        <span>{getFrequencyLabel(habit.scheduleVersions)}</span>
-      </div>
+        {habit.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+            {habit.description}
+          </p>
+        )}
 
-      {/* Stats Row */}
-      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <Flame className="h-3.5 w-3.5 text-primary" />
-          <span className="font-medium text-foreground">{habit.currentStreak}</span> day streak
-        </span>
-      </div>
+        {/* Meta Row */}
+        <div className="flex items-center gap-2 flex-wrap mb-3">
+          <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground">
+            {habit.category}
+          </span>
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            {getTrackingIcon(habit.trackingType)}
+            {habit.trackingType === "CHECKBOX"
+              ? "Checkbox"
+              : habit.targetValue
+              ? `${habit.targetValue} ${habit.unit ?? ""}`
+              : habit.trackingType.toLowerCase()}
+          </span>
+          <span className="text-xs text-muted-foreground">{getFrequencyLabel(habit.scheduleVersions)}</span>
+        </div>
+
+        {/* Streak */}
+        <div className="inline-flex items-center gap-1.5 text-sm">
+          <Flame className="h-4 w-4 text-primary" />
+          <span className="font-semibold text-foreground">{habit.currentStreak}</span>
+          <span className="text-muted-foreground">day streak</span>
+        </div>
+      </Link>
 
       {/* Actions */}
       {habit.status !== "ARCHIVED" && (
-        <div className="flex items-center gap-2 pt-1 border-t border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            disabled={isLoading}
+        <div className="flex items-center border-t border-border">
+          <Link
+            href={`/habits/${habit.id}/edit`}
+            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
           >
-            <Link href={`/habits/${habit.id}/edit`}>
-              <Edit className="h-3.5 w-3.5 mr-1" />
-              Edit
-            </Link>
-          </Button>
+            <Edit className="h-4 w-4" />
+            Edit
+          </Link>
+          <div className="w-px h-8 bg-border" />
           {habit.status === "ACTIVE" ? (
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => handleAction("pause")}
               disabled={isLoading}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors disabled:opacity-50"
             >
-              <Pause className="h-3.5 w-3.5 mr-1" />
+              <Pause className="h-4 w-4" />
               Pause
-            </Button>
+            </button>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => handleAction("resume")}
               disabled={isLoading}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors disabled:opacity-50"
             >
-              <Play className="h-3.5 w-3.5 mr-1" />
+              <Play className="h-4 w-4" />
               Resume
-            </Button>
+            </button>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
+          <div className="w-px h-8 bg-border" />
+          <button
             onClick={() => handleAction("archive")}
             disabled={isLoading}
-            className="text-destructive hover:text-destructive ml-auto"
+            className="flex-1 flex items-center justify-center gap-1.5 py-3 text-sm text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
           >
-            <Archive className="h-3.5 w-3.5 mr-1" />
+            <Archive className="h-4 w-4" />
             Archive
-          </Button>
+          </button>
         </div>
       )}
     </div>

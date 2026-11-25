@@ -38,7 +38,7 @@ export default async function DashboardLayout({
       <AppSidebar unreadCount={unreadCount} />
       <div className="lg:pl-60">
         <AppHeader user={headerUser} unreadCount={unreadCount} />
-        <main className="pb-20 lg:pb-6">{children}</main>
+        <main className="pb-24 lg:pb-6">{children}</main>
       </div>
       <MobileNavigation />
       <PWAInstallPrompt />

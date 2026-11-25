@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Search, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, Search, Zap, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { signOut } from "@/lib/auth-client";
 
 interface AppHeaderProps {
   user?: {
@@ -14,6 +16,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ user, unreadCount = 0 }: AppHeaderProps) {
+  const router = useRouter();
   const initials = user?.name
     ? user.name
         .split(" ")
@@ -23,8 +26,14 @@ export function AppHeader({ user, unreadCount = 0 }: AppHeaderProps) {
         .slice(0, 2)
     : "?";
 
+  async function handleLogout() {
+    await signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/80 backdrop-blur-sm lg:pl-60">
+    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/95 backdrop-blur-sm lg:pl-60">
       <div className="flex flex-1 items-center justify-between px-4 sm:px-6">
         {/* Mobile Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
@@ -51,24 +60,33 @@ export function AppHeader({ user, unreadCount = 0 }: AppHeaderProps) {
           {/* Notification bell with badge */}
           <Link
             href="/notifications"
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
           >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
           </Link>
 
           <Link href="/profile">
-            <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-primary transition-all">
+            <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-transparent hover:ring-primary transition-all">
               {user?.avatarUrl && (
                 <AvatarImage src={user.avatarUrl} alt={user.name || ""} />
               )}
-              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              <AvatarFallback className="text-sm">{initials}</AvatarFallback>
             </Avatar>
           </Link>
+
+          {/* Logout — only shown on mobile (desktop uses sidebar) */}
+          <button
+            onClick={handleLogout}
+            className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            aria-label="Sign out"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
       </div>
     </header>

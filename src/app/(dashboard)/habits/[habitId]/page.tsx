@@ -74,20 +74,20 @@ export default async function HabitDetailPage({ params }: PageProps) {
   );
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+    <div className="px-4 py-5 sm:px-6 lg:px-8 max-w-3xl mx-auto">
       {/* Back */}
       <Link
         href="/habits"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        className="inline-flex items-center gap-1.5 min-h-[44px] text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Habits
       </Link>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="flex items-start justify-between gap-4 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{habit.name}</h1>
+          <h1 className="text-xl font-bold text-foreground sm:text-2xl">{habit.name}</h1>
           {habit.description && (
             <p className="mt-1 text-sm text-muted-foreground">{habit.description}</p>
           )}
@@ -109,14 +109,14 @@ export default async function HabitDetailPage({ params }: PageProps) {
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" asChild className="h-10 px-4 rounded-xl">
             <Link href={`/habits/${habitId}/edit`}>Edit</Link>
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <Card>
           <CardContent className="p-4">
             <div className="text-xs text-muted-foreground mb-1">Current Streak</div>
@@ -158,13 +158,13 @@ export default async function HabitDetailPage({ params }: PageProps) {
 
       {/* Today's Completion */}
       {habit.status === "ACTIVE" && (
-        <Card className="mb-6">
+        <Card className="mb-4">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Today</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-foreground font-medium">{habit.name}</span>
+              <span className="text-[15px] text-foreground font-medium flex-1">{habit.name}</span>
               <HabitCompletionButton
                 habitId={habit.id}
                 trackingType={habit.trackingType}

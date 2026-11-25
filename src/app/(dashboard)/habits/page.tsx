@@ -41,27 +41,27 @@ export default async function HabitsPage({ searchParams }: PageProps) {
   const streakMap = new Map(habitStreaks.map((s) => [s.habitId, s.current]));
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="px-4 py-5 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">My Habits</h1>
-        <Button asChild>
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">My Habits</h1>
+        <Button asChild className="h-10 px-4 rounded-xl">
           <Link href="/habits/new">
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-1.5" />
             Add Habit
           </Link>
         </Button>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-border">
+      <div className="flex gap-0.5 mb-5 border-b border-border">
         {STATUS_TABS.map((tab) => {
           const isActive = (status ?? "") === tab.value;
           return (
             <Link
               key={tab.value}
               href={tab.value ? `/habits?status=${tab.value}` : "/habits"}
-              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+              className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                 isActive
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -75,20 +75,20 @@ export default async function HabitsPage({ searchParams }: PageProps) {
 
       {/* Habit List */}
       {habits.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-sm font-medium text-foreground mb-1">No habits yet</p>
-          <p className="text-xs text-muted-foreground mb-4">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-base font-medium text-foreground mb-1">No habits yet</p>
+          <p className="text-sm text-muted-foreground mb-5">
             Start building your first habit today.
           </p>
-          <Button asChild>
+          <Button asChild className="h-11 px-5 rounded-xl">
             <Link href="/habits/new">
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="h-4 w-4 mr-1.5" />
               Add Your First Habit
             </Link>
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {habits.map((habit) => (
             <HabitCard
               key={habit.id}

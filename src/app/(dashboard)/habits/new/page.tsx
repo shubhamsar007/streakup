@@ -34,16 +34,16 @@ export default function NewHabitPage() {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-2xl mx-auto">
-      <div className="mb-6">
+    <div className="px-4 py-5 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+      <div className="mb-5">
         <Link
           href="/habits"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 min-h-[44px] text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Habits
         </Link>
-        <h1 className="text-2xl font-bold text-foreground">Add New Habit</h1>
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">Add New Habit</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Define a new habit to track and build your streaks.
         </p>

@@ -84,7 +84,7 @@ export function HabitCompletionButton({
         onClick={isCompleted ? undoComplete : () => markComplete()}
         disabled={isLoading}
         className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+          "flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 shrink-0",
           isCompleted
             ? "bg-success border-success text-white"
             : "border-border bg-transparent hover:border-success hover:text-success"
@@ -92,9 +92,9 @@ export function HabitCompletionButton({
         aria-label={isCompleted ? "Mark incomplete" : "Mark complete"}
       >
         {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
-          <Check className={cn("h-4 w-4", isCompleted ? "opacity-100" : "opacity-50")} />
+          <Check className={cn("h-5 w-5", isCompleted ? "opacity-100" : "opacity-40")} />
         )}
       </button>
     );
@@ -103,7 +103,7 @@ export function HabitCompletionButton({
   // COUNT or DURATION
   if (isCompleted && completion) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <span className="text-sm text-success font-medium">
           {completion.completedValue ?? "—"} {unit}
         </span>
@@ -111,7 +111,7 @@ export function HabitCompletionButton({
           type="button"
           onClick={undoComplete}
           disabled={isLoading}
-          className="text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+          className="min-h-[36px] px-2 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
         >
           Undo
         </button>
@@ -121,7 +121,7 @@ export function HabitCompletionButton({
 
   if (showInput) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <Input
           type="number"
           min={0}
@@ -129,21 +129,21 @@ export function HabitCompletionButton({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={targetValue?.toString() ?? "0"}
-          className="h-8 w-20 text-sm"
+          className="h-10 w-20 text-sm"
           disabled={isLoading}
         />
         {unit && <span className="text-xs text-muted-foreground">{unit}</span>}
         <Button
-          size="sm"
           onClick={() => markComplete(parseFloat(inputValue) || undefined)}
           disabled={isLoading || !inputValue}
+          className="h-10 px-3"
         >
-          {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Log"}
+          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Log"}
         </Button>
         <button
           type="button"
           onClick={() => setShowInput(false)}
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="min-h-[36px] px-1 text-xs text-muted-foreground hover:text-foreground"
         >
           Cancel
         </button>
@@ -153,10 +153,10 @@ export function HabitCompletionButton({
 
   return (
     <Button
-      size="sm"
       variant="outline"
       onClick={() => setShowInput(true)}
       disabled={isLoading}
+      className="h-10 px-4 rounded-xl shrink-0"
     >
       Log {trackingType === "DURATION" ? "time" : "count"}
     </Button>
