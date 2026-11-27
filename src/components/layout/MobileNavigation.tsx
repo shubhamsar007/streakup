@@ -6,6 +6,14 @@ import { usePathname } from "next/navigation";
 import { Home, BookOpen, Users, User, Plus, X, Repeat2, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface MobileNavigationProps {
+  user?: {
+    username?: string;
+    avatarUrl?: string | null;
+    name?: string | null;
+  };
+}
+
 const leftNavItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/habits", icon: BookOpen, label: "Habits" },
@@ -13,12 +21,17 @@ const leftNavItems = [
 
 const rightNavItems = [
   { href: "/community", icon: Users, label: "Community" },
-  { href: "/profile", icon: User, label: "Profile" },
 ];
 
-export function MobileNavigation() {
+export function MobileNavigation({ user }: MobileNavigationProps) {
   const pathname = usePathname();
   const [showCreate, setShowCreate] = useState(false);
+
+  const profileHref = user?.username ? `/u/${user.username}` : "/profile";
+  const isProfileActive = pathname === "/profile" || pathname.startsWith("/u/");
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?";
 
   return (
     <>
@@ -92,7 +105,7 @@ export function MobileNavigation() {
             );
           })}
 
-          {/* Center create button — col 3 of 5, perfectly centered */}
+          {/* Center create button */}
           <div className="flex justify-center items-end pb-1">
             <button
               onClick={() => setShowCreate((v) => !v)}
@@ -128,6 +141,35 @@ export function MobileNavigation() {
               </Link>
             );
           })}
+
+          {/* "You" tab with avatar */}
+          <Link
+            href={profileHref}
+            className={cn(
+              "flex flex-col items-center gap-1 justify-end py-2 pb-1 transition-colors",
+              isProfileActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <div className={cn(
+              "h-6 w-6 rounded-full overflow-hidden shrink-0",
+              isProfileActive && "ring-2 ring-primary ring-offset-1 ring-offset-background"
+            )}>
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="You" className="h-full w-full object-cover" />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center bg-secondary text-muted-foreground">
+                  {user?.name ? (
+                    <span className="text-[9px] font-bold">{initials}</span>
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
+                </div>
+              )}
+            </div>
+            <span className={cn("text-[11px] font-medium", isProfileActive && "font-semibold")}>
+              You
+            </span>
+          </Link>
         </div>
       </nav>
     </>

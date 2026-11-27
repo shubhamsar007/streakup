@@ -40,7 +40,7 @@ export default async function DashboardLayout({
         <AppHeader user={headerUser} unreadCount={unreadCount} />
         <main className="pb-24 lg:pb-6">{children}</main>
       </div>
-      <MobileNavigation />
+      <MobileNavigation user={headerUser} />
       <PWAInstallPrompt />
     </div>
   );
