@@ -70,7 +70,7 @@ export function MobileNavigation() {
 
       {/* Nav bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-secondary/95 backdrop-blur-sm lg:hidden">
-        <div className="flex items-center justify-around px-2 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="grid grid-cols-5 items-end px-1 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {leftNavItems.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -80,7 +80,7 @@ export function MobileNavigation() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 min-w-[56px] min-h-[48px] justify-center rounded-xl px-3 py-1.5 transition-colors",
+                  "flex flex-col items-center gap-1 justify-end py-2 pb-1 transition-colors",
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -92,19 +92,21 @@ export function MobileNavigation() {
             );
           })}
 
-          {/* Center create button */}
-          <button
-            onClick={() => setShowCreate((v) => !v)}
-            className={cn(
-              "flex items-center justify-center w-14 h-14 rounded-full transition-all -mt-5 shadow-lg",
-              showCreate
-                ? "bg-foreground text-background shadow-foreground/20"
-                : "bg-primary text-primary-foreground shadow-primary/40"
-            )}
-            aria-label="Create"
-          >
-            {showCreate ? <X className="h-6 w-6" /> : <Plus className="h-7 w-7" />}
-          </button>
+          {/* Center create button — col 3 of 5, perfectly centered */}
+          <div className="flex justify-center items-end pb-1">
+            <button
+              onClick={() => setShowCreate((v) => !v)}
+              className={cn(
+                "flex items-center justify-center w-14 h-14 rounded-full transition-all -translate-y-3 shadow-lg",
+                showCreate
+                  ? "bg-foreground text-background shadow-foreground/20"
+                  : "bg-primary text-primary-foreground shadow-primary/40"
+              )}
+              aria-label="Create"
+            >
+              {showCreate ? <X className="h-6 w-6" /> : <Plus className="h-7 w-7" />}
+            </button>
+          </div>
 
           {rightNavItems.map((item) => {
             const isActive =
@@ -115,7 +117,7 @@ export function MobileNavigation() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 min-w-[56px] min-h-[48px] justify-center rounded-xl px-3 py-1.5 transition-colors",
+                  "flex flex-col items-center gap-1 justify-end py-2 pb-1 transition-colors",
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
