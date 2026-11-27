@@ -114,14 +114,6 @@ export default async function HabitsPage({ searchParams }: PageProps) {
           ))}
         </div>
       )}
-      {/* FAB — mobile only */}
-      <Link
-        href="/habits/new"
-        className="sm:hidden fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
-        aria-label="Add new habit"
-      >
-        <Plus className="h-7 w-7" />
-      </Link>
     </div>
   );
 }

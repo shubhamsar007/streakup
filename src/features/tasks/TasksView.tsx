@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Plus, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -49,11 +50,20 @@ function offsetDate(dateStr: string, days: number): string {
 }
 
 export function TasksView({ initialTasks, initialDate }: TasksViewProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [date, setDate] = useState(initialDate);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(searchParams.get("new") === "true");
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("new") === "true") {
+      setShowForm(true);
+      router.replace("/tasks");
+    }
+  }, [searchParams, router]);
 
   const fetchTasks = useCallback(async (d: string) => {
     setLoading(true);
@@ -322,16 +332,6 @@ export function TasksView({ initialTasks, initialDate }: TasksViewProps) {
         </div>
       )}
 
-      {/* FAB — mobile only */}
-      {!showForm && !editingTask && (
-        <button
-          onClick={() => { setShowForm(true); setEditingTask(null); }}
-          className="sm:hidden fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
-          aria-label="Add new task"
-        >
-          <Plus className="h-7 w-7" />
-        </button>
-      )}
     </div>
   );
 }
