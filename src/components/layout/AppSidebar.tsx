@@ -13,6 +13,7 @@ import {
   Settings,
   Zap,
   LogOut,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
@@ -21,6 +22,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/habits", icon: BookOpen, label: "My Habits" },
+  { href: "/tasks", icon: ClipboardList, label: "Tasks" },
   { href: "/activity", icon: Calendar, label: "Activity Calendar" },
   { href: "/statistics", icon: BarChart3, label: "Statistics" },
   { href: "/community", icon: Users, label: "Community" },

@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Calendar, Users, User } from "lucide-react";
+import { Home, BookOpen, ClipboardList, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const mobileNavItems = [
   { href: "/dashboard", icon: Home, label: "Home" },
   { href: "/habits", icon: BookOpen, label: "Habits" },
-  { href: "/activity", icon: Calendar, label: "Activity" },
+  { href: "/tasks", icon: ClipboardList, label: "Tasks" },
   { href: "/community", icon: Users, label: "Community" },
   { href: "/profile", icon: User, label: "Profile" },
 ];

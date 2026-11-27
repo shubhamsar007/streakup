@@ -45,7 +45,8 @@ export default async function HabitsPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-xl font-bold text-foreground sm:text-2xl">My Habits</h1>
-        <Button asChild className="h-10 px-4 rounded-xl">
+        {/* Desktop add button — hidden on mobile (FAB handles it) */}
+        <Button asChild className="hidden sm:flex h-10 px-4 rounded-xl">
           <Link href="/habits/new">
             <Plus className="h-4 w-4 mr-1.5" />
             Add Habit
@@ -88,7 +89,7 @@ export default async function HabitsPage({ searchParams }: PageProps) {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-4">
           {habits.map((habit) => (
             <HabitCard
               key={habit.id}
@@ -113,6 +114,14 @@ export default async function HabitsPage({ searchParams }: PageProps) {
           ))}
         </div>
       )}
+      {/* FAB — mobile only */}
+      <Link
+        href="/habits/new"
+        className="sm:hidden fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
+        aria-label="Add new habit"
+      >
+        <Plus className="h-7 w-7" />
+      </Link>
     </div>
   );
 }

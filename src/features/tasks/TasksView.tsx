@@ -161,18 +161,19 @@ export function TasksView({ initialTasks, initialDate }: TasksViewProps) {
   const isToday = date === initialDate;
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+    <div className="px-4 py-5 sm:px-6 lg:px-8 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Daily Tasks</h1>
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="text-xl font-bold text-foreground sm:text-2xl">Tasks</h1>
+        {/* Desktop add button */}
         <Button
-          size="sm"
+          className="hidden sm:flex h-10 px-4 rounded-xl"
           onClick={() => {
             setShowForm(true);
             setEditingTask(null);
           }}
         >
-          <Plus className="h-4 w-4 mr-1" />
+          <Plus className="h-4 w-4 mr-1.5" />
           Add Task
         </Button>
       </div>
@@ -319,6 +320,17 @@ export function TasksView({ initialTasks, initialDate }: TasksViewProps) {
             ))}
           </div>
         </div>
+      )}
+
+      {/* FAB — mobile only */}
+      {!showForm && !editingTask && (
+        <button
+          onClick={() => { setShowForm(true); setEditingTask(null); }}
+          className="sm:hidden fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
+          aria-label="Add new task"
+        >
+          <Plus className="h-7 w-7" />
+        </button>
       )}
     </div>
   );
