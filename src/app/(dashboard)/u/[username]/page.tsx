@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { getPublicProfile } from "@/server/services/profileService";
 import { FollowButton } from "@/features/social/FollowButton";
 import { ActivityCard } from "@/features/social/ActivityCard";
+import { LogoutButton } from "@/features/auth/LogoutButton";
 import { Flame, Users, Trophy, Lock, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 
@@ -56,11 +57,15 @@ export default async function PublicProfilePage({
                 <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
                 <p className="text-sm text-muted-foreground">@{profile.username}</p>
               </div>
-              {!profile.isOwnProfile && session && (
-                <FollowButton
-                  userId={profile.id}
-                  initialStatus={profile.followStatus}
-                />
+              {profile.isOwnProfile ? (
+                <LogoutButton />
+              ) : (
+                session && (
+                  <FollowButton
+                    userId={profile.id}
+                    initialStatus={profile.followStatus}
+                  />
+                )
               )}
             </div>
             {profile.profile?.bio && (
